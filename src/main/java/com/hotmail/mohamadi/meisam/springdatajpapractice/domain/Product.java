@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 
 @Table(
+
     uniqueConstraints = {
             @UniqueConstraint(name = "name_must_be_unique" , columnNames = {"name"})
     }
@@ -24,5 +25,6 @@ public class Product {
     private long id;
     private String name;
     private int price;
+
 
 }

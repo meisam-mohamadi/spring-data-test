@@ -3,6 +3,9 @@ package com.hotmail.mohamadi.meisam.springdatajpapractice.service;
 import com.hotmail.mohamadi.meisam.springdatajpapractice.dao.ProductRepository;
 import com.hotmail.mohamadi.meisam.springdatajpapractice.domain.Product;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.ls.LSOutput;
 
@@ -58,30 +61,25 @@ public class ProductService {
                 (prd) -> System.out.println(prd),
                 () -> System.out.println("product not found")
         );
-
     }
 
 
-    public void selectByNameStartWithAndPriceLessThan(){
+    public void selectByNameStartWithAndPriceLessThan() {
         List<Product> result = repository.selectByNameStartWithAndPriceLessThan("iph", 1350);
         System.out.println(result);
     }
 
-    public void deleteById(long id)
-    {
+    public void deleteById(long id) {
         repository.deleteById(id);
     }
 
-    public void delete(Product product)
-    {
+    public void delete(Product product) {
         repository.delete(product);
     }
 
-    public void updateNameById(long id , String newName)
-    {
+    public void updateNameById(long id, String newName) {
         Optional<Product> optionalProduct = repository.findById(id);
-        if(optionalProduct.isPresent())
-        {
+        if (optionalProduct.isPresent()) {
             optionalProduct.get().setName(newName);
             repository.save(optionalProduct.get());
         }
@@ -95,6 +93,74 @@ public class ProductService {
 //        );
 
     }
+
+    public void selectByNameInQueryMethod(String name) {
+        Product product = repository.findByName(name).get();
+        System.out.println(product);
+    }
+
+    public void selectByNameLikePattern(String pattern) {
+        List<Product> byNameLike = repository.findByNameLike(pattern);
+        byNameLike.stream().forEach(prd -> System.out.println(prd));
+    }
+
+    public void selectByNameContains(String partOfName) {
+        List<Product> byNameLike = repository.findByNameContains(partOfName);
+        byNameLike.stream().forEach(prd -> System.out.println(prd));
+    }
+
+    public void selectByNameStarts(String startOfName) {
+        List<Product> byNameLike = repository.findByNameStartsWith(startOfName);
+        byNameLike.stream().forEach(prd -> System.out.println(prd));
+    }
+
+    public void betweenTest(int minimum, int maximum) {
+        List<Product> byPriceBetween = repository.findByPriceBetween(minimum, maximum);
+        System.out.println(byPriceBetween);
+    }
+
+    public void selectByNameEqualsOrNameEquals(String name1, String name2) {
+        List<Product> byPriceBetween = repository.findByNameEqualsOrNameEquals(name1, name2);
+        System.out.println(byPriceBetween);
+    }
+
+    public void selectAllBySqlTest() {
+        List<Product> products = repository.selectAllInSqlQuery(800);
+        System.out.println(products);
+    }
+
+    public void selectAllWithPaging() {
+        Page<Product> all = repository.findAll(PageRequest.of(1, 3));
+        all.forEach(prd -> System.out.println(prd));
+
+    }
+
+    public void pagingInQueryMethod(int minimumPrice, PageRequest pageRequest) {
+        List<Product> byPriceGreaterThan = repository.findByPriceGreaterThan(minimumPrice, pageRequest);
+        byPriceGreaterThan.forEach(prd -> System.out.println(prd));
+    }
+
+    public void pagingInQueryMethod(int minimumPrice) {
+        List<Product> byPriceGreaterThan = repository.findByPriceGreaterThan(minimumPrice, null);
+        byPriceGreaterThan.forEach(prd -> System.out.println(prd));
+    }
+
+
+    public void selectAllSortedProduct()
+    {
+//        List<Product> products = repository.findAll(Sort.by(Sort.Direction.DESC,"price","name"));
+        List<Product> products = repository.findAll(Sort.by(Sort.Direction.DESC,"price")
+                                               .and(Sort.by(Sort.Direction.ASC,"name")));
+        products.forEach(prd -> System.out.println(prd));
+    }
+
+    public void queryMethodAndSorting()
+    {
+        List<Product> products = repository.findByPriceLessThan(900, Sort.by("price"));
+        products.forEach(prd -> System.out.println(prd));
+
+    }
+
 
 
 }
